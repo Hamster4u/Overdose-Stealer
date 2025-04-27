@@ -31,9 +31,53 @@ This public version is intended for educational purposes, showcasing the core fu
 - **BouncyCastle.Crypto.dll**  
   - Available via NuGet: [BouncyCastle](https://www.nuget.org/packages/BouncyCastle/)
 
+### Antivirus Detection Status (as of 2025-04-27)
+- **Adaware**: ✅ Clean
+- **Alyac**: ✅ Clean
+- **Amiti**: ✅ Clean
+- **Arcabit**: ✅ Clean
+- **Avast**: ✅ Clean
+- **AVG**: ✅ Clean
+- **Avira**: ✅ Clean
+- **Bullguard**: ✅ Clean
+- **Clamav**: ✅ Clean
+- **Comodo**: ✅ Clean
+- **Comodo Linux**: ✅ Clean
+- **DrWeb**: ✅ Clean
+- **Emsisoft**: ✅ Clean
+- **Escan**: ✅ Clean
+- **F-Prot**: ✅ Clean
+- **F-Secure**: ✅ Clean
+- **GData**: ✅ Clean
+- **Ikarus**: ✅ Clean
+- **Immunet**: ✅ Clean
+- **Kaspersky**: ✅ Clean
+- **MaxSecure**: ✅ Clean
+- **McAfee**: ✅ Clean
+- **Microsoft Defender**: ✅ Clean
+- **Nano**: ✅ Clean
+- **Nod32**: ✅ Clean
+- **Norman**: ✅ Clean
+- **QuickHeal**: ✅ Clean
+- **SecureAge Apex**: ❌ Unknown (Detected)
+- **Seqrite**: ✅ Clean
+- **Sophos**: ✅ Clean
+- **TrendMicro**: ✅ Clean
+- **VBA32**: ✅ Clean
+- **ViritExplorer**: ✅ Clean
+- **VirusFighter**: ✅ Clean
+- **Xvirus**: ✅ Clean
+- **Zillya**: ✅ Clean
+- **ZoneAlarm**: ✅ Clean
+- **Zoner**: ✅ Clean
+
+**Source**: [WebSec Scanner Result](https://websec.net/scanner/result/9fb3481f-fc26-473c-815b-cb0a3cb3bcfa)
+
 ## Disclaimer
 
 ⚠️ **This project is for educational and security research purposes only.**  
 It demonstrates techniques used in real-world malware but is not intended for malicious use. Using this code to collect data from systems you do not own or have explicit consent to access is illegal and unethical. **The author is not responsible for any misuse of this tool.**
 
 Respect privacy and legal boundaries at all times.
+
+![cd4dd9d794422a3d4b36a469d4ff6e1f](https://github.com/user-attachments/assets/69012334-6bf0-4865-a519-27ef0b26d0a2)
