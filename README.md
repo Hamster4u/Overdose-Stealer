@@ -79,7 +79,7 @@ This public version is intended for educational purposes, showcasing the core fu
 - **Arcabit**: Undetected ✅
 - **Avast**: Undetected ✅ [screenshot.jpg](https://github.com/user-attachments/assets/ed7f6a5b-7520-45ff-8e87-abd26892de36)
 - **AVG**: Undetected ✅
-- **Bitdefender**: Undetected ✅
+- **Bitdefender**: Undetected ✅ [screenshot.jpg](https://github.com/user-attachments/assets/f96eb16f-e212-41a0-83ef-e43ffd1683b7)
 - **Crowdstrike**: Detected ❌
 - **F-Secure**: Undetected ✅
 - **IKARUS**: Undetected ✅
