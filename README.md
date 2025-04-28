@@ -31,7 +31,7 @@ This public version is intended for educational purposes, showcasing the core fu
 - **BouncyCastle.Crypto.dll**  
   - Available via NuGet: [BouncyCastle](https://www.nuget.org/packages/BouncyCastle/)
 
-### Antivirus Detection Status (as of 2025-04-27)
+### Antivirus [scantime] Detection Status (as of 2025-04-27)
 - **Adaware**: ✅ Clean
 - **Alyac**: ✅ Clean
 - **Amiti**: ✅ Clean
@@ -72,6 +72,23 @@ This public version is intended for educational purposes, showcasing the core fu
 - **Zoner**: ✅ Clean
 
 **Source**: [WebSec Scanner Result](https://websec.net/scanner/result/9fb3481f-fc26-473c-815b-cb0a3cb3bcfa)
+
+### Antivirus [Runtime] Scan Results (as of 2025-04-27)
+
+- **Amiti**: Undetected ✅
+- **Arcabit**: Undetected ✅
+- **Avast**: Undetected ✅ [screenshot.jpg](https://github.com/user-attachments/assets/ed7f6a5b-7520-45ff-8e87-abd26892de36)
+- **AVG**: Undetected ✅
+- **Bitdefender**: Undetected ✅
+- **Crowdstrike**: Detected ❌
+- **F-Secure**: Undetected ✅
+- **IKARUS**: Undetected ✅
+- **Kaspersky**: Undetected ✅ [screenshot.jpg](https://github.com/user-attachments/assets/e7ccd412-b09d-4184-8ea3-15e0d3bc0c5c)
+- **Microsoft Defender**: Undetected ✅
+- **Nod32**: Undetected ✅ [screenshot.jpg](https://github.com/user-attachments/assets/9538a0bd-d636-42b7-b209-d8476e604696)
+- **Norton**: Undetected ✅
+- **Threatdown**: Undetected ✅
+- **Xvirus**: Undetected ✅
 
 ## Disclaimer
 
