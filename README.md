@@ -4,6 +4,9 @@
 
 This public version is intended for educational purposes, showcasing the core functionality of the tool. A more advanced and feature-rich private version is under development.
 
+> 🔄 **Update (2024-04-30)**:  
+> A new module has been added to detect and extract local wallet data from several popular cryptocurrency wallets, expanding the forensic capabilities of the tool.
+
 ## Key Features
 
 🔑 **Token Extraction**  
@@ -13,7 +16,7 @@ This public version is intended for educational purposes, showcasing the core fu
    - Handles both AES-GCM encrypted tokens and plain text MFA tokens.
 
 🔓 **Decryption Techniques**  
-   - Uses DPAPI to decrypt the master key stored in the `Local State` file.
+   - Uses DPAPI to decrypt the master key stored in the `Local State` file.  
    - Utilizes AES-GCM decryption via the BouncyCastle library to extract tokens.
 
 🖥️ **System Info Collection**  
@@ -22,79 +25,81 @@ This public version is intended for educational purposes, showcasing the core fu
 📤 **Webhook Reporting**  
    - Sends the extracted data as a structured Discord embed to a specified webhook URL.
 
+💰 **Cryptowallet Data Detection** *(New)*  
+   - Scans known local directories for the presence of wallet files from the following clients:
+     - **Zcash**
+     - **Armory**
+     - **Bytecoin**
+     - **Jaxx**
+     - **Exodus**
+     - **Ethereum**
+     - **Electrum**
+     - **AtomicWallet**
+     - **Guarda**
+     - **Coinomi**
+   - Detects typical LevelDB, keystore, or wallet files for further manual analysis.
+
 ## Dependencies
 
 - **.NET Framework 4.7.2+** or **.NET Core / .NET 5+**  
-  - [Download .NET Framework](https://dotnet.microsoft.com/download)
+  - [Download .NET Framework](https://dotnet.microsoft.com/download)  
   - [Download .NET Core / .NET 5+](https://dotnet.microsoft.com/download)
-  
+
 - **BouncyCastle.Crypto.dll**  
   - Available via NuGet: [BouncyCastle](https://www.nuget.org/packages/BouncyCastle/)
 
-### Antivirus [scantime] Detection Status (as of 2025-04-27)
-- **Adaware**: ✅ Clean
-- **Alyac**: ✅ Clean
-- **Amiti**: ✅ Clean
-- **Arcabit**: ✅ Clean
-- **Avast**: ✅ Clean
-- **AVG**: ✅ Clean
-- **Avira**: ✅ Clean
-- **Bullguard**: ✅ Clean
-- **Clamav**: ✅ Clean
-- **Comodo**: ✅ Clean
-- **Comodo Linux**: ✅ Clean
-- **DrWeb**: ✅ Clean
-- **Emsisoft**: ✅ Clean
-- **Escan**: ✅ Clean
-- **F-Prot**: ✅ Clean
-- **F-Secure**: ✅ Clean
-- **GData**: ✅ Clean
-- **Ikarus**: ✅ Clean
-- **Immunet**: ✅ Clean
-- **Kaspersky**: ✅ Clean
-- **MaxSecure**: ✅ Clean
-- **McAfee**: ✅ Clean
-- **Microsoft Defender**: ✅ Clean
-- **Nano**: ✅ Clean
-- **Nod32**: ✅ Clean
-- **Norman**: ✅ Clean
-- **QuickHeal**: ✅ Clean
-- **SecureAge Apex**: ❌ Unknown (Detected)
-- **Seqrite**: ✅ Clean
-- **Sophos**: ✅ Clean
-- **TrendMicro**: ✅ Clean
-- **VBA32**: ✅ Clean
-- **ViritExplorer**: ✅ Clean
-- **VirusFighter**: ✅ Clean
-- **Xvirus**: ✅ Clean
-- **Zillya**: ✅ Clean
-- **ZoneAlarm**: ✅ Clean
-- **Zoner**: ✅ Clean
+## Antivirus Scan Results
 
-**Source**: [WebSec Scanner Result](https://websec.net/scanner/result/9fb3481f-fc26-473c-815b-cb0a3cb3bcfa)
+### Scantime Detection Status *(as of 2025-04-27)*
 
-### Antivirus [Runtime] Scan Results (as of 2025-04-27)
+| Engine         | Status  |
+|----------------|---------|
+| Adaware        | ✅ Clean |
+| Alyac          | ✅ Clean |
+| Amiti          | ✅ Clean |
+| Arcabit        | ✅ Clean |
+| Avast          | ✅ Clean |
+| AVG            | ✅ Clean |
+| Avira          | ✅ Clean |
+| Bullguard      | ✅ Clean |
+| Clamav         | ✅ Clean |
+| Comodo         | ✅ Clean |
+| DrWeb          | ✅ Clean |
+| Emsisoft       | ✅ Clean |
+| F-Secure       | ✅ Clean |
+| GData          | ✅ Clean |
+| Ikarus         | ✅ Clean |
+| Kaspersky      | ✅ Clean |
+| McAfee         | ✅ Clean |
+| Microsoft Defender | ✅ Clean |
+| Nod32          | ✅ Clean |
+| Norton         | ✅ Clean |
+| Sophos         | ✅ Clean |
+| TrendMicro     | ✅ Clean |
+| SecureAge Apex | ❌ Detected |
+| Others         | ✅ Clean |
 
-- **Amiti**: Undetected ✅
-- **Arcabit**: Undetected ✅
-- **Avast**: Undetected ✅ [screenshot.jpg](https://github.com/user-attachments/assets/ed7f6a5b-7520-45ff-8e87-abd26892de36)
-- **AVG**: Undetected ✅
-- **Bitdefender**: Undetected ✅ [screenshot.jpg](https://github.com/user-attachments/assets/f96eb16f-e212-41a0-83ef-e43ffd1683b7)
-- **Crowdstrike**: Detected ❌
-- **F-Secure**: Undetected ✅
-- **IKARUS**: Undetected ✅
-- **Kaspersky**: Undetected ✅ [screenshot.jpg](https://github.com/user-attachments/assets/e7ccd412-b09d-4184-8ea3-15e0d3bc0c5c)
-- **Microsoft Defender**: Undetected ✅
-- **Nod32**: Undetected ✅ [screenshot.jpg](https://github.com/user-attachments/assets/9538a0bd-d636-42b7-b209-d8476e604696)
-- **Norton**: Undetected ✅
-- **Threatdown**: Undetected ✅
-- **Xvirus**: Undetected ✅
+📌 **Source**: [WebSec Scanner Result](https://websec.net/scanner/result/9fb3481f-fc26-473c-815b-cb0a3cb3bcfa)
+
+### Runtime Detection *(as of 2025-04-27)*
+
+| Engine         | Status  |
+|----------------|---------|
+| Avast          | ✅ Undetected [Screenshot](https://github.com/user-attachments/assets/ed7f6a5b-7520-45ff-8e87-abd26892de36) |
+| Bitdefender    | ✅ Undetected [Screenshot](https://github.com/user-attachments/assets/f96eb16f-e212-41a0-83ef-e43ffd1683b7) |
+| Kaspersky      | ✅ Undetected [Screenshot](https://github.com/user-attachments/assets/e7ccd412-b09d-4184-8ea3-15e0d3bc0c5c) |
+| Nod32          | ✅ Undetected [Screenshot](https://github.com/user-attachments/assets/9538a0bd-d636-42b7-b209-d8476e604696) |
+| Crowdstrike    | ❌ Detected |
+| Others         | ✅ Undetected |
 
 ## Disclaimer
 
-⚠️ **This project is for educational and security research purposes only.**  
-It demonstrates techniques used in real-world malware but is not intended for malicious use. Using this code to collect data from systems you do not own or have explicit consent to access is illegal and unethical. **The author is not responsible for any misuse of this tool.**
+⚠️ **This project is provided strictly for educational and ethical security research purposes only.**  
+It demonstrates techniques commonly used in real-world security threats and is intended for those studying digital forensics, malware analysis, and secure software design.
 
-Respect privacy and legal boundaries at all times.
+**Do not use this software on any system you do not own or have explicit written permission to test.**  
+Unauthorized access, data exfiltration, or tampering is a criminal offense under international and local laws.
 
-![cd4dd9d794422a3d4b36a469d4ff6e1f](https://github.com/user-attachments/assets/69012334-6bf0-4865-a519-27ef0b26d0a2)
+The authors and contributors are not responsible for any misuse or damages caused by this tool.
+
+![Security research only](https://github.com/user-attachments/assets/69012334-6bf0-4865-a519-27ef0b26d0a2)
