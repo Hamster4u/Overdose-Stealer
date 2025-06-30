@@ -6,7 +6,7 @@ This public version is intended for educational purposes, showcasing the core fu
 
 > 🔄 **Update (2025-06-30)**:  
 > 🛡️ New version includes changes to evade Microsoft Defender detection: 
-❌ Bypasses Program:Win32/Wacapew.C!ml
+> ❌ Bypasses Program:Win32/Wacapew.C!ml
 
 
 > 🔄 **Update (2025-04-30)**:  
