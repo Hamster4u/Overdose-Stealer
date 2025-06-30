@@ -50,7 +50,7 @@ This public version is intended for educational purposes, showcasing the core fu
 
 ## Antivirus Scan Results
 
-### Scantime Detection Status *(as of 2025-05-13)*
+### Scantime Detection Status *(as of 2025-06-30)*
 
 | Engine         | Status  |
 |----------------|---------|
@@ -71,7 +71,7 @@ This public version is intended for educational purposes, showcasing the core fu
 | Ikarus         | ✅ Clean |
 | Kaspersky      | ✅ Clean |
 | McAfee         | ✅ Clean |
-| Microsoft Defender | ✅ Clean |
+| Microsoft Defender | ❌ Program:Win32/Wacapew.C!ml |
 | Nod32          | ✅ Clean |
 | Norton         | ✅ Clean |
 | Sophos         | ✅ Clean |
