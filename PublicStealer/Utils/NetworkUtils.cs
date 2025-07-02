@@ -1,6 +1,6 @@
 using System.Net;
 
-namespace OdPS.Utils
+namespace DataHarvester.Utils
 {
     internal static class NetworkUtils
     {
