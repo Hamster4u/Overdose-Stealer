@@ -4,12 +4,11 @@
 
 This public version is intended for educational purposes, showcasing the core functionality of the tool. A more advanced and feature-rich private version is under development.
 
-> 🔄 **Update (2025-06-30)**:  
-> 🛡️ New version includes changes to evade Microsoft Defender detection: ❌ Bypasses Program:Win32/Wacapew.C!ml
+> 🔄 Current Update (2025-07-02) - Update #003: Further enhancements to the remaining functionalities, complementing the previous update's changes aimed at evading detection.
 
+> 🔄 Update (2025-06-30) - Update #002: New version includes changes to evade Microsoft Defender detection: ❌ Bypasses Program:Win32/Wacapew.C!ml
 
-> 🔄 **Update (2025-04-30)**:  
-> A new module has been added to detect and extract local wallet data from several popular cryptocurrency wallets, expanding the forensic capabilities of the tool.
+>🔄 Update (2025-04-30) - Update #001: A new module has been added to detect and extract local wallet data from several popular cryptocurrency wallets, expanding the forensic capabilities of the tool
 
 ## Key Features
 
@@ -54,7 +53,7 @@ This public version is intended for educational purposes, showcasing the core fu
 
 ## Antivirus Scan Results
 
-### Scantime Detection Status *(as of 2025-06-30)*
+### Scantime Detection Status *(as of 2025-07-02)*
 
 | Engine         | Status  |
 |----------------|---------|
@@ -75,12 +74,12 @@ This public version is intended for educational purposes, showcasing the core fu
 | Ikarus         | ✅ Clean |
 | Kaspersky      | ✅ Clean |
 | McAfee         | ✅ Clean |
-| Microsoft Defender | ❌ Program:Win32/Wacapew.C!ml |
+| Microsoft Defender | ✅ Clean |
 | Nod32          | ✅ Clean |
 | Norton         | ✅ Clean |
 | Sophos         | ✅ Clean |
 | TrendMicro     | ✅ Clean |
-| SecureAge Apex | ❌ Detected |
+| SecureAge Apex | ❌ Detected Unknown |
 | Others         | ✅ Clean |
 
 📌 **Source**: [WebSec Scanner Result](https://websec.net/scanner/result/d4fd26a5-ab89-4feb-9b61-29637a890be3)
