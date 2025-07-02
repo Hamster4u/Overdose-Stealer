@@ -11,7 +11,7 @@ using OdPS.Models; // Import models for the webhook structure
 
 namespace OdPS
 {
-    internal static class WebhookSender
+    internal static class WHS // WebhookSender
     {
         // Webhook URL where data will be sent. Make sure to replace this with your own webhook URL.
         private static readonly string webhookUrl = "HERE_UR_WEBHOOK";
