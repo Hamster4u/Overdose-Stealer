@@ -3,7 +3,7 @@
 **Overdose Stealer** is a tool developed to demonstrate the process of extracting and decrypting Discord authentication tokens stored locally on a Windows system. This tool uses DPAPI and AES-GCM decryption techniques to recover the tokens from Discord’s installation files. The extracted tokens, along with system information like the username and IP address, are sent to a specified Discord webhook in a structured format.
 
 This public version is intended for educational purposes, showcasing the core functionality of the tool. A more advanced and feature-rich private version is under development.
-> 🔄 Current Update (2025-07-02) - Update #003: Further enhancements to the remaining functionalities, complementing the previous update's changes aimed at evading detection.
+> 🔄 Current Update (2025-07-03) - Update #003: Further enhancements to the remaining functionalities, complementing the previous update's changes aimed at evading detection.
  - 😂 Funny Fact: Despite all our evasion efforts, the tool was briefly flagged by IKARUS Antivirus. We're pretty sure it was just lonely and wanted some attention, considering it's usually only seen on computers running Windows 98 in a museum exhibit.
 
 > 🔄 Update (2025-06-30) - Update #002: New version includes changes to evade Microsoft Defender detection: ❌ Bypasses Program:Win32/Wacapew.C!ml
@@ -53,7 +53,7 @@ This public version is intended for educational purposes, showcasing the core fu
 
 ## Antivirus Scan Results
 
-### Scantime Detection Status *(as of 2025-07-02)*
+### Scantime Detection Status *(as of 2025-07-03)*
 
 | Engine         | Status  |
 |----------------|---------|
@@ -79,10 +79,10 @@ This public version is intended for educational purposes, showcasing the core fu
 | Norton         | ✅ Clean |
 | Sophos         | ✅ Clean |
 | TrendMicro     | ✅ Clean |
-| SecureAge Apex | ❌ Detected Unknown |
+| SecureAge Apex | ✅ Clean |
 | Others         | ✅ Clean |
 
-📌 **Source**: [WebSec Scanner Result](https://websec.net/scanner/result/d4fd26a5-ab89-4feb-9b61-29637a890be3)
+📌 **Source**: [WebSec Scanner Result](https://websec.net/scanner/result/e65f4694-088a-47f6-adb9-d00532ef29b1)
 
 ### Runtime Detection *(as of 2025-04-27)*
 
